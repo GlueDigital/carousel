@@ -4,12 +4,14 @@
 #   myCarousel = require('carousel') boxDiv, sliderDiv
 #   myCarousel.next()
 
-module.exports = carousel = (box, slider) ->
+module.exports = carousel = (box, slider, opts={}) ->
+  opts.amplitudeCoef = opts.amplitudeCoef or 0.8
+  opts.timeConstant = opts.timeConstant or 325
 
   # Instance vars
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
     timestamp = ticker = amplitude = target = timeConstant = count = overlay =
-    null
+    auto = null
 
   # Internal functions
   xpos = (e) ->
@@ -77,7 +79,7 @@ module.exports = carousel = (box, slider) ->
     clearInterval ticker
     target = offset
     if velocity > 10 or velocity < -10
-      amplitude = 0.8 * velocity
+      amplitude = opts.amplitudeCoef * velocity
       target = offset + amplitude
     target = Math.round(target / snap) * snap
     amplitude = target - offset
@@ -96,25 +98,50 @@ module.exports = carousel = (box, slider) ->
     getSlideCount: ->
       max / boxWidth
 
-    move: (screens) ->
+    move: (slides) ->
+      lastSlide = ret.getSlideCount()
+      currentSlide = ret.getCurrentSlide()
+      if currentSlide + slides > lastSlide
+        slides = lastSlide - currentSlide
+      if currentSlide + slides < 0
+        slides = -currentSlide
+
       clearInterval ticker
       target = offset
-      target = (Math.round(target / snap) + screens) * snap
+      target = (Math.round(target / snap) + slides) * snap
       amplitude = target - offset
       timestamp = Date.now()
       requestAnimationFrame autoScroll
 
-      endScreen = ret.getCurrentSlide() + screens
-      lastScreen = ret.getSlideCount()
-      endScreen = 0 if endScreen < 0
-      endScreen = lastScreen if endScreen > lastScreen
-      endScreen
+      ret.getCurrentSlide() + slides
 
     next: ->
       ret.move 1
 
     prev: ->
       ret.move -1
+
+    nextCyclic: ->
+      if ret.getCurrentSlide() is ret.getSlideCount()
+        ret.move -ret.getCurrentSlide()
+      else
+        ret.move 1
+
+    prevCyclic: ->
+      if ret.getCurrentSlide is 0
+        ret.move ret.getSlideCount()
+      else
+        ret.move -1
+
+    auto:
+      start: (interval = 3000) ->
+        f = ->
+          ret.nextCyclic() unless pressed
+        auto = setInterval f, interval
+      stop: ->
+        clearInterval auto if auto
+        auto = null
+
 
   # Initialize
   if typeof window.ontouchstart isnt 'undefined'
@@ -130,7 +157,7 @@ module.exports = carousel = (box, slider) ->
   max = sliderWidth - boxWidth
   offset = min = 0
   pressed = false
-  timeConstant = 200 # ms
+  timeConstant = opts.timeConstant
 
   snap = boxWidth
   count = boxWidth / sliderWidth
