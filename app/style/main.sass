@@ -1,0 +1,55 @@
+body
+  background-color: #eee
+
+#container
+  margin: 40px auto
+  position: relative
+  width: 600px
+  height: 400px
+
+  .arrow
+    position: absolute
+    box-sizing: border-box
+    top: 185px
+    width: 30px
+    height: 30px
+    text-align: center
+    padding: 7px
+    background-color: #668
+    border-radius: 100%
+    color: white
+    font-weight: bold
+    cursor: pointer
+    user-select: none
+    -webkit-user-select: none
+
+    &#next
+      right: -40px
+    &#prev
+      left: -40px
+
+
+#view
+  outline: 1px solid red
+  width: 600px
+  height: 400px
+  box-shadow: 0px 0px 30px 0px rgba(0,0,0,0.75)
+  white-space: nowrap
+  word-break: keep-all
+  overflow: hidden
+
+  #scrollable
+    font-size: 0
+
+  #scrollable > div
+    margin: 0
+    box-sizing: border-box
+    display: inline-block
+    width: 600px
+    height: 400px
+    color: blue
+    font-size: 50px
+    background: linear-gradient(to right, rgba(201,201,201,1), rgba(136,136,136,1))
+    border: 1px solid black
+    text-align: center
+    padding: 25%
