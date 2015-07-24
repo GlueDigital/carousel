@@ -7,17 +7,23 @@
 module.exports = carousel = (box, slider, opts={}) ->
   opts.amplitudeCoef = opts.amplitudeCoef or 0.8
   opts.timeConstant = opts.timeConstant or 325
+  opts.allowScroll = opts.allowScroll or false
 
-  # Instance vars
+  # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
     timestamp = ticker = amplitude = target = timeConstant = count = overlay =
-    auto = null
+    auto = alsoScroll = xstart = ystart = startOffset = null
 
   # Internal functions
   xpos = (e) ->
     if e.targetTouches?.length >= 1
         return e.targetTouches[0].clientX
     e.clientX
+
+  ypos = (e) ->
+    if e.targetTouches?.length >= 1
+        return e.targetTouches[0].clientY
+    e.clientY
 
   scroll = (x) ->
     if x > max
@@ -50,7 +56,10 @@ module.exports = carousel = (box, slider, opts={}) ->
 
   tap = (e) ->
     pressed = true
-    reference = xpos e
+    xstart = reference = xpos e
+    ystart = ypos e
+    alsoScroll = false
+    startOffset = offset
 
     velocity = amplitude = 0
     frame = offset
@@ -58,20 +67,29 @@ module.exports = carousel = (box, slider, opts={}) ->
     clearInterval ticker
     ticker = setInterval track, 100
 
-    e.preventDefault()
-    e.stopPropagation()
-    false
+    if not opts.allowScroll
+      e.preventDefault()
+      e.stopPropagation()
+      false
 
   drag = (e) ->
     if pressed
       x = xpos e
       delta = reference - x
+      if opts.allowScroll
+        # Scroll only if movement has been mostly vertical
+        y = ypos e
+        totalY = Math.abs ystart - y
+        totalX = Math.abs xstart - x
+        if totalY > totalX and totalY > 30
+          alsoScroll = true
       if delta > 2 or delta < -2
         reference = x
         scroll offset + delta
-    e.preventDefault()
-    e.stopPropagation()
-    false
+    if not alsoScroll
+      e.preventDefault()
+      e.stopPropagation()
+      false
 
   release = (e) ->
     pressed = false
@@ -86,9 +104,10 @@ module.exports = carousel = (box, slider, opts={}) ->
     timestamp = Date.now()
     requestAnimationFrame autoScroll
 
-    e.preventDefault()
-    e.stopPropagation()
-    false
+    if not alsoScroll # Prevent warning about cancelling scroll
+      e.preventDefault()
+      e.stopPropagation()
+      false
 
   # Public functions
   ret =
