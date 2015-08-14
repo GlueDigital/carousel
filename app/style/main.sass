@@ -56,3 +56,24 @@ body
     border: 1px solid black
     text-align: center
     padding: 25%
+
+.dots
+  position: absolute
+  top: 10px
+  left: 0
+  right: 0
+  text-align: center
+  opacity: 0.7
+
+  .dot
+    display: inline-block
+    height: 6px
+    width: 6px
+    background-color: transparent
+    border: 1px solid white
+    border-radius: 100%
+    margin: 3px
+    transition: background-color 0.4s ease
+
+    &.active
+      background-color: white

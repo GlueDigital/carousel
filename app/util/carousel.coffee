@@ -8,11 +8,12 @@ module.exports = carousel = (box, slider, opts={}) ->
   opts.amplitudeCoef = opts.amplitudeCoef or 0.8
   opts.timeConstant = opts.timeConstant or 325
   opts.allowScroll = opts.allowScroll or false
+  opts.withDots = opts.withDots or true
 
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
-    timestamp = ticker = amplitude = target = timeConstant = count = overlay =
-    auto = alsoScroll = xstart = ystart = startOffset = null
+    timestamp = ticker = amplitude = target = timeConstant = overlay = auto =
+    alsoScroll = xstart = ystart = startOffset = currSlide = dots = null
 
   # Internal functions
   xpos = (e) ->
@@ -33,6 +34,15 @@ module.exports = carousel = (box, slider, opts={}) ->
     else
       offset = x
     slider.style[xform] = 'translateX(' + (-offset) + 'px)'
+    t = Math.round offset / boxWidth
+    if t isnt currSlide
+      currSlide = t
+      updateDots()
+
+  updateDots = ->
+    if dots
+      Array.prototype.map.call dots.childNodes, (dot, i) ->
+        dot.classList.toggle 'active', i is currSlide
 
   track = ->
     now = Date.now()
@@ -112,18 +122,17 @@ module.exports = carousel = (box, slider, opts={}) ->
   # Public functions
   ret =
     getCurrentSlide: ->
-      Math.round offset / boxWidth
+      currSlide
 
     getSlideCount: ->
       max / boxWidth
 
     move: (slides) ->
       lastSlide = ret.getSlideCount()
-      currentSlide = ret.getCurrentSlide()
-      if currentSlide + slides > lastSlide
-        slides = lastSlide - currentSlide
-      if currentSlide + slides < 0
-        slides = -currentSlide
+      if currSlide + slides > lastSlide
+        slides = lastSlide - currSlide
+      if currSlide + slides < 0
+        slides = -currSlide
 
       clearInterval ticker
       target = offset
@@ -132,7 +141,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       timestamp = Date.now()
       requestAnimationFrame autoScroll
 
-      ret.getCurrentSlide() + slides
+      currSlide + slides
 
     next: ->
       ret.move 1
@@ -179,7 +188,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   timeConstant = opts.timeConstant
 
   snap = boxWidth
-  count = boxWidth / sliderWidth
+  currSlide = 0
 
   xform = 'transform'
   ['webkit', 'Moz', 'O', 'ms'].every (prefix) ->
@@ -188,5 +197,17 @@ module.exports = carousel = (box, slider, opts={}) ->
       xform = e
       return false
     return true
+
+  # Add indicator dots if requested
+  if opts.withDots
+    dots = document.createElement 'div'
+    dots.classList.add 'dots'
+    count = max / boxWidth
+    for i in [0..count]
+      dot = document.createElement 'div'
+      dot.classList.add 'dot'
+      dots.appendChild dot
+    updateDots()
+    box.appendChild dots
 
   ret
