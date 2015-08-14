@@ -82,12 +82,7 @@
       timestamp = Date.now();
       clearInterval(ticker);
       ticker = setInterval(track, 100);
-      mustCancel = false;
-      if (!opts.allowScroll) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
+      return mustCancel = false;
     };
     drag = function(e) {
       var delta, totalX, totalY, x, y;
@@ -127,12 +122,7 @@
       target = Math.round(target / snap) * snap;
       amplitude = target - offset;
       timestamp = Date.now();
-      requestAnimationFrame(autoScroll);
-      if (!alsoScroll) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }
+      return requestAnimationFrame(autoScroll);
     };
     cancelClick = function(e) {
       if (mustCancel) {

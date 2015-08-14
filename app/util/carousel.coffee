@@ -79,10 +79,10 @@ module.exports = carousel = (box, slider, opts={}) ->
     ticker = setInterval track, 100
     mustCancel = false
 
-    if not opts.allowScroll
-      e.preventDefault()
-      e.stopPropagation()
-      false
+    # if not opts.allowScroll
+    #   e.preventDefault()
+    #   e.stopPropagation()
+    #   false
 
   drag = (e) ->
     if pressed
@@ -118,10 +118,10 @@ module.exports = carousel = (box, slider, opts={}) ->
     timestamp = Date.now()
     requestAnimationFrame autoScroll
 
-    if not alsoScroll # Prevent warning about cancelling scroll
-      e.preventDefault()
-      e.stopPropagation()
-      false
+    # if not alsoScroll # Prevent warning about cancelling scroll
+    #   e.preventDefault()
+    #   e.stopPropagation()
+    #   false
 
   cancelClick = (e) ->
     if mustCancel
