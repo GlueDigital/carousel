@@ -13,7 +13,8 @@ module.exports = carousel = (box, slider, opts={}) ->
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
     timestamp = ticker = amplitude = target = timeConstant = overlay = auto =
-    alsoScroll = xstart = ystart = startOffset = currSlide = dots = null
+    alsoScroll = xstart = ystart = startOffset = currSlide = dots =
+    mustCancel = null
 
   # Internal functions
   xpos = (e) ->
@@ -76,6 +77,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     timestamp = Date.now()
     clearInterval ticker
     ticker = setInterval track, 100
+    mustCancel = false
 
     if not opts.allowScroll
       e.preventDefault()
@@ -86,11 +88,13 @@ module.exports = carousel = (box, slider, opts={}) ->
     if pressed
       x = xpos e
       delta = reference - x
+      totalY = Math.abs ystart - y
+      totalX = Math.abs xstart - x
+      if totalX > 30 or totalY > 30
+        mustCancel = true
       if opts.allowScroll
         # Scroll only if movement has been mostly vertical
         y = ypos e
-        totalY = Math.abs ystart - y
-        totalX = Math.abs xstart - x
         if totalY > totalX and totalY > 30
           alsoScroll = true
       if delta > 2 or delta < -2
@@ -115,6 +119,12 @@ module.exports = carousel = (box, slider, opts={}) ->
     requestAnimationFrame autoScroll
 
     if not alsoScroll # Prevent warning about cancelling scroll
+      e.preventDefault()
+      e.stopPropagation()
+      false
+
+  cancelClick = (e) ->
+    if mustCancel
       e.preventDefault()
       e.stopPropagation()
       false
@@ -179,6 +189,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   slider.addEventListener 'mousedown', tap
   slider.addEventListener 'mousemove', drag
   slider.addEventListener 'mouseup', release
+  slider.addEventListener 'click', cancelClick
 
   boxWidth = parseInt(getComputedStyle(box).width, 10)
   sliderWidth = slider.scrollWidth

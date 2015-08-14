@@ -2,7 +2,7 @@
   var carousel;
 
   module.exports = carousel = function(box, slider, opts) {
-    var alsoScroll, amplitude, auto, autoScroll, boxWidth, count, currSlide, dot, dots, drag, frame, i, j, max, min, offset, overlay, pressed, ref, reference, release, ret, scroll, sliderWidth, snap, startOffset, tap, target, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
+    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, count, currSlide, dot, dots, drag, frame, i, j, max, min, mustCancel, offset, overlay, pressed, ref, reference, release, ret, scroll, sliderWidth, snap, startOffset, tap, target, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
     if (opts == null) {
       opts = {};
     }
@@ -10,7 +10,7 @@
     opts.timeConstant = opts.timeConstant || 325;
     opts.allowScroll = opts.allowScroll || false;
     opts.withDots = opts.withDots || true;
-    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = null;
+    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = null;
     xpos = function(e) {
       var ref;
       if (((ref = e.targetTouches) != null ? ref.length : void 0) >= 1) {
@@ -82,6 +82,7 @@
       timestamp = Date.now();
       clearInterval(ticker);
       ticker = setInterval(track, 100);
+      mustCancel = false;
       if (!opts.allowScroll) {
         e.preventDefault();
         e.stopPropagation();
@@ -93,10 +94,13 @@
       if (pressed) {
         x = xpos(e);
         delta = reference - x;
+        totalY = Math.abs(ystart - y);
+        totalX = Math.abs(xstart - x);
+        if (totalX > 30 || totalY > 30) {
+          mustCancel = true;
+        }
         if (opts.allowScroll) {
           y = ypos(e);
-          totalY = Math.abs(ystart - y);
-          totalX = Math.abs(xstart - x);
           if (totalY > totalX && totalY > 30) {
             alsoScroll = true;
           }
@@ -125,6 +129,13 @@
       timestamp = Date.now();
       requestAnimationFrame(autoScroll);
       if (!alsoScroll) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    };
+    cancelClick = function(e) {
+      if (mustCancel) {
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -203,6 +214,7 @@
     slider.addEventListener('mousedown', tap);
     slider.addEventListener('mousemove', drag);
     slider.addEventListener('mouseup', release);
+    slider.addEventListener('click', cancelClick);
     boxWidth = parseInt(getComputedStyle(box).width, 10);
     sliderWidth = slider.scrollWidth;
     max = sliderWidth - boxWidth;
