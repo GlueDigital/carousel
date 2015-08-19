@@ -9,6 +9,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   opts.timeConstant = opts.timeConstant or 325
   opts.allowScroll = opts.allowScroll or false
   opts.withDots = opts.withDots or true
+  opts.dotsParent = opts.dotsParent or null
 
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
@@ -219,6 +220,9 @@ module.exports = carousel = (box, slider, opts={}) ->
       dot.classList.add 'dot'
       dots.appendChild dot
     updateDots()
-    box.appendChild dots
+    if opts.dotsParent
+      opts.dotsParent.appendChild dots
+    else
+      box.appendChild dots
 
   ret

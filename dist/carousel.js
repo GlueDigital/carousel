@@ -10,6 +10,7 @@
     opts.timeConstant = opts.timeConstant || 325;
     opts.allowScroll = opts.allowScroll || false;
     opts.withDots = opts.withDots || true;
+    opts.dotsParent = opts.dotsParent || null;
     min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = null;
     xpos = function(e) {
       var ref;
@@ -233,7 +234,11 @@
         dots.appendChild(dot);
       }
       updateDots();
-      box.appendChild(dots);
+      if (opts.dotsParent) {
+        opts.dotsParent.appendChild(dots);
+      } else {
+        box.appendChild(dots);
+      }
     }
     return ret;
   };
