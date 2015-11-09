@@ -60,7 +60,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     if amplitude
       elapsed = Date.now() - timestamp
       delta = -amplitude * Math.exp(-elapsed / timeConstant)
-      if delta > 5 or delta < -5
+      if delta > 0.5 or delta < -0.5
         scroll target + delta
         requestAnimationFrame autoScroll
       else
