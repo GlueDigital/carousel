@@ -1,9 +1,3 @@
-# Carousel 0.1
-# Simple horizontal carousel library, with momentum and snapping.
-# Usage:
-#   myCarousel = require('carousel') boxDiv, sliderDiv
-#   myCarousel.next()
-
 module.exports = carousel = (box, slider, opts={}) ->
   opts.amplitudeCoef = opts.amplitudeCoef or 0.8
   opts.timeConstant = opts.timeConstant or 325

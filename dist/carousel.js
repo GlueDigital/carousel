@@ -64,7 +64,7 @@
       if (amplitude) {
         elapsed = Date.now() - timestamp;
         delta = -amplitude * Math.exp(-elapsed / timeConstant);
-        if (delta > 5 || delta < -5) {
+        if (delta > 0.5 || delta < -0.5) {
           scroll(target + delta);
           return requestAnimationFrame(autoScroll);
         } else {

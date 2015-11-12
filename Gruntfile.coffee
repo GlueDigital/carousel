@@ -44,9 +44,9 @@ module.exports = (grunt) ->
           server: './public'
 
     coffee:
-      release:
+      build:
         files:
-          'dist/carousel.js': 'app/util/carousel.coffee'
+          'dist/carousel.js': 'app/lib/carousel.coffee'
 
   grunt.loadNpmTasks 'grunt-contrib-sass'
   grunt.loadNpmTasks 'grunt-browserify'
@@ -55,6 +55,7 @@ module.exports = (grunt) ->
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
 
-  grunt.registerTask 'build', ['copy:html', 'sass', 'browserify']
-  grunt.registerTask 'release', ['coffee:release']
-  grunt.registerTask 'default', ['build', 'browserSync', 'watch']
+  grunt.registerTask 'dev', ['dev-build', 'browserSync', 'watch']
+  grunt.registerTask 'dev-build', ['copy:html', 'sass', 'browserify']
+  grunt.registerTask 'build', ['coffee:build']
+  grunt.registerTask 'default', ['build']

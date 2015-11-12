@@ -1,11 +1,23 @@
-# Usage
-You need to have npm, Ruby and Sass installed.
-Instructions:
-  1. Make sure you have grunt-cli installed:
-    'npm install -g grunt-cli'
-  2. Install all dependencies:
-    'npm install'
-  3. Start the watcher:
-    'grunt'
+Carousel
+========
+
+Simple carousel library.
+
+## Installation
+
+  npm install git+ssh://git@gitlab.com:glue-gl/carousel.git --save
+
+## Usage
+
+  Carousel = require('carousel')
+  instance = Carousel boxDiv, sliderDiv
+  instance.next()
+
+## Contributing
+
+To help with development, start the quick edit mode by running
+
+  grunt dev
+
 The browser window should appear with the page, live-reloading with any changes.
 Happy coding!

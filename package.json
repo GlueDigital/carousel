@@ -1,14 +1,15 @@
 {
   "name": "carousel",
-  "version": "0.1.0",
-  "description": "Demo for carousel module.",
-  "main": "app/main.coffee",
+  "version": "0.2.0",
+  "description": "Simple carousel module.",
+  "main": "dist/carousel",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "grunt dev",
+    "build": "grunt build"
   },
   "author": "Anxo Soto",
   "license": "ISC",
-  "dependencies": {
+  "devDependencies": {
     "browser-sync": "^2.7.12",
     "coffeeify": "^1.1.0",
     "grunt": "^0.4.5",

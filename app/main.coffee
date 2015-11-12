@@ -1,4 +1,4 @@
-Carousel = require './util/carousel'
+Carousel = require './lib/carousel'
 
 # Initialization logic
 window.addEventListener 'DOMContentLoaded', ->
