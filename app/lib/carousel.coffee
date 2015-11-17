@@ -9,18 +9,23 @@ module.exports = carousel = (box, slider, opts={}) ->
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
     timestamp = ticker = amplitude = target = timeConstant = overlay = auto =
     alsoScroll = xstart = ystart = startOffset = currSlide = dots =
-    mustCancel = null
+    mustCancel = boxWidth = null
 
   # Internal functions
   xpos = (e) ->
     if e.targetTouches?.length >= 1
-        return e.targetTouches[0].clientX
+      return e.targetTouches[0].clientX
     e.clientX
 
   ypos = (e) ->
     if e.targetTouches?.length >= 1
-        return e.targetTouches[0].clientY
+      return e.targetTouches[0].clientY
     e.clientY
+
+  updateDots = ->
+    if dots
+      Array.prototype.map.call dots.childNodes, (dot, i) ->
+        dot.classList.toggle 'active', i is currSlide
 
   scroll = (x) ->
     if x > max
@@ -34,11 +39,6 @@ module.exports = carousel = (box, slider, opts={}) ->
     if t isnt currSlide
       currSlide = t
       updateDots()
-
-  updateDots = ->
-    if dots
-      Array.prototype.map.call dots.childNodes, (dot, i) ->
-        dot.classList.toggle 'active', i is currSlide
 
   track = ->
     now = Date.now()
@@ -56,7 +56,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       delta = -amplitude * Math.exp(-elapsed / timeConstant)
       if delta > 0.5 or delta < -0.5
         scroll target + delta
-        requestAnimationFrame autoScroll
+        window.requestAnimationFrame autoScroll
       else
         scroll target
 
@@ -70,8 +70,8 @@ module.exports = carousel = (box, slider, opts={}) ->
     velocity = amplitude = 0
     frame = offset
     timestamp = Date.now()
-    clearInterval ticker
-    ticker = setInterval track, 100
+    window.clearInterval ticker
+    ticker = window.setInterval track, 100
     mustCancel = false
 
     # if not opts.allowScroll
@@ -82,6 +82,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   drag = (e) ->
     if pressed
       x = xpos e
+      y = ypos e
       delta = reference - x
       totalY = Math.abs ystart - y
       totalX = Math.abs xstart - x
@@ -89,7 +90,6 @@ module.exports = carousel = (box, slider, opts={}) ->
         mustCancel = true
       if opts.allowScroll
         # Scroll only if movement has been mostly vertical
-        y = ypos e
         if totalY > totalX and totalY > 30
           alsoScroll = true
       if delta > 2 or delta < -2
@@ -100,10 +100,10 @@ module.exports = carousel = (box, slider, opts={}) ->
       e.stopPropagation()
       false
 
-  release = (e) ->
+  release = ->
     pressed = false
 
-    clearInterval ticker
+    window.clearInterval ticker
     target = offset
     if velocity > 10 or velocity < -10
       amplitude = opts.amplitudeCoef * velocity
@@ -111,7 +111,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     target = Math.round(target / snap) * snap
     amplitude = target - offset
     timestamp = Date.now()
-    requestAnimationFrame autoScroll
+    window.requestAnimationFrame autoScroll
 
     # if not alsoScroll # Prevent warning about cancelling scroll
     #   e.preventDefault()
@@ -139,12 +139,12 @@ module.exports = carousel = (box, slider, opts={}) ->
       if currSlide + slides < 0
         slides = -currSlide
 
-      clearInterval ticker
+      window.clearInterval ticker
       target = offset
       target = (Math.round(target / snap) + slides) * snap
       amplitude = target - offset
       timestamp = Date.now()
-      requestAnimationFrame autoScroll
+      window.requestAnimationFrame autoScroll
 
       currSlide + slides
 
@@ -170,9 +170,9 @@ module.exports = carousel = (box, slider, opts={}) ->
       start: (interval = 3000) ->
         f = ->
           ret.nextCyclic() unless pressed
-        auto = setInterval f, interval
+        auto = window.setInterval f, interval
       stop: ->
-        clearInterval auto if auto
+        window.clearInterval auto if auto
         auto = null
 
 
@@ -186,7 +186,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   slider.addEventListener 'mouseup', release
   slider.addEventListener 'click', cancelClick, true
 
-  boxWidth = parseInt(getComputedStyle(box).width, 10)
+  boxWidth = parseInt(window.getComputedStyle(box).width, 10)
   sliderWidth = slider.scrollWidth
   max = sliderWidth - boxWidth
   offset = min = 0
@@ -209,7 +209,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     dots = document.createElement 'div'
     dots.classList.add 'dots'
     count = max / boxWidth
-    for i in [0..count]
+    for [0..count]
       dot = document.createElement 'div'
       dot.classList.add 'dot'
       dots.appendChild dot

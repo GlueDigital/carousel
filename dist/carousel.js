@@ -2,7 +2,7 @@
   var carousel;
 
   module.exports = carousel = function(box, slider, opts) {
-    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, count, currSlide, dot, dots, drag, frame, i, j, max, min, mustCancel, offset, overlay, pressed, ref, reference, release, ret, scroll, sliderWidth, snap, startOffset, tap, target, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
+    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, count, currSlide, dot, dots, drag, frame, j, max, min, mustCancel, offset, overlay, pressed, ref, reference, release, ret, scroll, sliderWidth, snap, startOffset, tap, target, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
     if (opts == null) {
       opts = {};
     }
@@ -11,7 +11,7 @@
     opts.allowScroll = opts.allowScroll || false;
     opts.withDots = opts.withDots || true;
     opts.dotsParent = opts.dotsParent || null;
-    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = null;
+    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
     xpos = function(e) {
       var ref;
       if (((ref = e.targetTouches) != null ? ref.length : void 0) >= 1) {
@@ -25,6 +25,13 @@
         return e.targetTouches[0].clientY;
       }
       return e.clientY;
+    };
+    updateDots = function() {
+      if (dots) {
+        return Array.prototype.map.call(dots.childNodes, function(dot, i) {
+          return dot.classList.toggle('active', i === currSlide);
+        });
+      }
     };
     scroll = function(x) {
       var t;
@@ -40,13 +47,6 @@
       if (t !== currSlide) {
         currSlide = t;
         return updateDots();
-      }
-    };
-    updateDots = function() {
-      if (dots) {
-        return Array.prototype.map.call(dots.childNodes, function(dot, i) {
-          return dot.classList.toggle('active', i === currSlide);
-        });
       }
     };
     track = function() {
@@ -66,7 +66,7 @@
         delta = -amplitude * Math.exp(-elapsed / timeConstant);
         if (delta > 0.5 || delta < -0.5) {
           scroll(target + delta);
-          return requestAnimationFrame(autoScroll);
+          return window.requestAnimationFrame(autoScroll);
         } else {
           return scroll(target);
         }
@@ -81,14 +81,15 @@
       velocity = amplitude = 0;
       frame = offset;
       timestamp = Date.now();
-      clearInterval(ticker);
-      ticker = setInterval(track, 100);
+      window.clearInterval(ticker);
+      ticker = window.setInterval(track, 100);
       return mustCancel = false;
     };
     drag = function(e) {
       var delta, totalX, totalY, x, y;
       if (pressed) {
         x = xpos(e);
+        y = ypos(e);
         delta = reference - x;
         totalY = Math.abs(ystart - y);
         totalX = Math.abs(xstart - x);
@@ -96,7 +97,6 @@
           mustCancel = true;
         }
         if (opts.allowScroll) {
-          y = ypos(e);
           if (totalY > totalX && totalY > 30) {
             alsoScroll = true;
           }
@@ -112,9 +112,9 @@
         return false;
       }
     };
-    release = function(e) {
+    release = function() {
       pressed = false;
-      clearInterval(ticker);
+      window.clearInterval(ticker);
       target = offset;
       if (velocity > 10 || velocity < -10) {
         amplitude = opts.amplitudeCoef * velocity;
@@ -123,7 +123,7 @@
       target = Math.round(target / snap) * snap;
       amplitude = target - offset;
       timestamp = Date.now();
-      return requestAnimationFrame(autoScroll);
+      return window.requestAnimationFrame(autoScroll);
     };
     cancelClick = function(e) {
       if (mustCancel) {
@@ -148,12 +148,12 @@
         if (currSlide + slides < 0) {
           slides = -currSlide;
         }
-        clearInterval(ticker);
+        window.clearInterval(ticker);
         target = offset;
         target = (Math.round(target / snap) + slides) * snap;
         amplitude = target - offset;
         timestamp = Date.now();
-        requestAnimationFrame(autoScroll);
+        window.requestAnimationFrame(autoScroll);
         return currSlide + slides;
       },
       next: function() {
@@ -187,11 +187,11 @@
               return ret.nextCyclic();
             }
           };
-          return auto = setInterval(f, interval);
+          return auto = window.setInterval(f, interval);
         },
         stop: function() {
           if (auto) {
-            clearInterval(auto);
+            window.clearInterval(auto);
           }
           return auto = null;
         }
@@ -206,7 +206,7 @@
     slider.addEventListener('mousemove', drag);
     slider.addEventListener('mouseup', release);
     slider.addEventListener('click', cancelClick, true);
-    boxWidth = parseInt(getComputedStyle(box).width, 10);
+    boxWidth = parseInt(window.getComputedStyle(box).width, 10);
     sliderWidth = slider.scrollWidth;
     max = sliderWidth - boxWidth;
     offset = min = 0;
@@ -228,7 +228,7 @@
       dots = document.createElement('div');
       dots.classList.add('dots');
       count = max / boxWidth;
-      for (i = j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
+      for (j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; 0 <= ref ? j++ : j--) {
         dot = document.createElement('div');
         dot.classList.add('dot');
         dots.appendChild(dot);

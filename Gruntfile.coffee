@@ -48,14 +48,25 @@ module.exports = (grunt) ->
         files:
           'dist/carousel.js': 'app/lib/carousel.coffee'
 
+    coffeelint:
+      all: ['app/**/*.coffee']
+      options:
+        undefined_variables:
+          module: "coffeelint-undefined-variables"
+          level: "error"
+          globals: [
+            "module", "require", "window", "document"
+          ]
+
   grunt.loadNpmTasks 'grunt-contrib-sass'
   grunt.loadNpmTasks 'grunt-browserify'
   grunt.loadNpmTasks 'grunt-contrib-watch'
   grunt.loadNpmTasks 'grunt-browser-sync'
   grunt.loadNpmTasks 'grunt-contrib-copy'
   grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-coffeelint'
 
   grunt.registerTask 'dev', ['dev-build', 'browserSync', 'watch']
   grunt.registerTask 'dev-build', ['copy:html', 'sass', 'browserify']
-  grunt.registerTask 'build', ['coffee:build']
+  grunt.registerTask 'build', ['coffeelint', 'coffee:build']
   grunt.registerTask 'default', ['build']
