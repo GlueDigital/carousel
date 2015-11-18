@@ -2,7 +2,7 @@
   var carousel;
 
   module.exports = carousel = function(box, slider, opts) {
-    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, count, currSlide, dot, dots, drag, frame, j, max, min, mustCancel, offset, overlay, pressed, ref, reference, release, ret, scroll, sliderWidth, snap, startOffset, tap, target, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
+    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, currSlide, dots, drag, frame, initialize, max, min, mustCancel, offset, overlay, pressed, reference, release, ret, scroll, snap, startOffset, tap, target, tearDown, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
     if (opts == null) {
       opts = {};
     }
@@ -11,6 +11,8 @@
     opts.allowScroll = opts.allowScroll || false;
     opts.withDots = opts.withDots || true;
     opts.dotsParent = opts.dotsParent || null;
+    opts.useTranslate3d = opts.useTranslate3d || true;
+    opts.snapParts = opts.snapParts || true;
     min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
     xpos = function(e) {
       var ref;
@@ -42,8 +44,12 @@
       } else {
         offset = x;
       }
-      slider.style[xform] = 'translateX(' + (-offset) + 'px)';
-      t = Math.round(offset / boxWidth);
+      if (opts.useTranslate3d) {
+        slider.style[xform] = 'translate3d(' + (-offset) + 'px, 0, 0)';
+      } else {
+        slider.style[xform] = 'translateX(' + (-offset) + 'px)';
+      }
+      t = Math.round(offset / snap);
       if (t !== currSlide) {
         currSlide = t;
         return updateDots();
@@ -132,12 +138,84 @@
         return false;
       }
     };
+    initialize = function() {
+      var c, candidate, count, dot, j, ref, sliderWidth;
+      if (typeof window.ontouchstart !== 'undefined') {
+        slider.addEventListener('touchstart', tap);
+        slider.addEventListener('touchmove', drag);
+        slider.addEventListener('touchend', release);
+      }
+      slider.addEventListener('mousedown', tap);
+      slider.addEventListener('mousemove', drag);
+      slider.addEventListener('mouseup', release);
+      slider.addEventListener('click', cancelClick, true);
+      boxWidth = parseInt(window.getComputedStyle(box).width, 10);
+      sliderWidth = slider.scrollWidth;
+      max = sliderWidth - boxWidth;
+      offset = min = 0;
+      pressed = false;
+      timeConstant = opts.timeConstant;
+      currSlide = 0;
+      snap = boxWidth;
+      if (opts.snapParts) {
+        c = slider.firstChild;
+        while (c) {
+          if (c.nodeType !== 3) {
+            candidate = parseInt(window.getComputedStyle(c).width, 10);
+            if (candidate > 20 && candidate < snap) {
+              snap = candidate;
+              break;
+            }
+          }
+          c = c.nextSibling;
+        }
+      }
+      xform = 'transform';
+      ['webkit', 'Moz', 'O', 'ms'].every(function(prefix) {
+        var e;
+        e = prefix + 'Transform';
+        if ('undefined' !== typeof slider.style[e]) {
+          xform = e;
+          return false;
+        }
+        return true;
+      });
+      if (opts.withDots) {
+        dots = document.createElement('div');
+        dots.classList.add('dots');
+        count = max / snap;
+        for (j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; 0 <= ref ? j++ : j--) {
+          dot = document.createElement('div');
+          dot.classList.add('dot');
+          dots.appendChild(dot);
+        }
+        updateDots();
+        if (opts.dotsParent) {
+          return opts.dotsParent.appendChild(dots);
+        } else {
+          return box.appendChild(dots);
+        }
+      }
+    };
+    tearDown = function() {
+      slider.removeEventListener('touchstart', tap);
+      slider.removeEventListener('touchmove', drag);
+      slider.removeEventListener('touchend', release);
+      slider.removeEventListener('mousedown', tap);
+      slider.removeEventListener('mousemove', drag);
+      slider.removeEventListener('mouseup', release);
+      slider.removeEventListener('click', cancelClick, true);
+      if (dots) {
+        dots.parentNode.removeChild(dots);
+      }
+      return scroll(0);
+    };
     ret = {
       getCurrentSlide: function() {
         return currSlide;
       },
       getSlideCount: function() {
-        return max / boxWidth;
+        return max / snap;
       },
       move: function(slides) {
         var lastSlide;
@@ -195,51 +273,13 @@
           }
           return auto = null;
         }
+      },
+      reset: function() {
+        tearDown();
+        return initialize();
       }
     };
-    if (typeof window.ontouchstart !== 'undefined') {
-      slider.addEventListener('touchstart', tap);
-      slider.addEventListener('touchmove', drag);
-      slider.addEventListener('touchend', release);
-    }
-    slider.addEventListener('mousedown', tap);
-    slider.addEventListener('mousemove', drag);
-    slider.addEventListener('mouseup', release);
-    slider.addEventListener('click', cancelClick, true);
-    boxWidth = parseInt(window.getComputedStyle(box).width, 10);
-    sliderWidth = slider.scrollWidth;
-    max = sliderWidth - boxWidth;
-    offset = min = 0;
-    pressed = false;
-    timeConstant = opts.timeConstant;
-    snap = boxWidth;
-    currSlide = 0;
-    xform = 'transform';
-    ['webkit', 'Moz', 'O', 'ms'].every(function(prefix) {
-      var e;
-      e = prefix + 'Transform';
-      if ('undefined' !== typeof slider.style[e]) {
-        xform = e;
-        return false;
-      }
-      return true;
-    });
-    if (opts.withDots) {
-      dots = document.createElement('div');
-      dots.classList.add('dots');
-      count = max / boxWidth;
-      for (j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; 0 <= ref ? j++ : j--) {
-        dot = document.createElement('div');
-        dot.classList.add('dot');
-        dots.appendChild(dot);
-      }
-      updateDots();
-      if (opts.dotsParent) {
-        opts.dotsParent.appendChild(dots);
-      } else {
-        box.appendChild(dots);
-      }
-    }
+    initialize();
     return ret;
   };
 

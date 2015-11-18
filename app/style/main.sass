@@ -1,7 +1,7 @@
 body
   background-color: #eee
 
-#container
+#container-whole, #container-parts
   margin: 40px auto
   position: relative
   width: 600px
@@ -26,36 +26,44 @@ body
     &:hover
       box-shadow: 0 0 8px 0 rgba(20,80,230,1)
 
-    &#next
+    &.next
       right: -50px
-    &#prev
+    &.prev
       left: -50px
 
 
-#view
-  outline: 1px solid red
-  width: 600px
-  height: 400px
-  box-shadow: 0 0 30px 0 rgba(0,0,0,0.75)
-  white-space: nowrap
-  word-break: keep-all
-  overflow: hidden
-
-  #scrollable
-    font-size: 0
-
-  #scrollable > div
-    margin: 0
-    box-sizing: border-box
-    display: inline-block
+  .view
+    outline: 1px solid red
     width: 600px
     height: 400px
-    color: blue
-    font-size: 50px
-    background: linear-gradient(to right, rgba(201,201,201,1), rgba(136,136,136,1))
-    border: 1px solid black
-    text-align: center
-    padding: 25%
+    box-shadow: 0 0 30px 0 rgba(0,0,0,0.75)
+    white-space: nowrap
+    word-break: keep-all
+    overflow: hidden
+
+    .scrollable
+      font-size: 0
+
+      & > div
+        background: linear-gradient(to right, rgba(201,201,201,1), rgba(136,136,136,1))
+        border: 1px solid black
+        box-sizing: border-box
+        color: blue
+        display: inline-block
+        font-size: 50px
+        height: 400px
+        line-height: 400px
+        margin: 0
+        text-align: center
+
+
+#container-whole
+  .scrollable > div
+    width: 600px
+
+#container-parts
+  .scrollable > div
+    width: 200px
 
 .dots
   position: absolute

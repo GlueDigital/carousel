@@ -1,12 +1,15 @@
 Carousel = require './lib/carousel'
 
-# Initialization logic
-window.addEventListener 'DOMContentLoaded', ->
-  slider = document.getElementById 'scrollable'
-  box = document.getElementById 'view'
-  # We make the carousel available through window so you can play with it.
-  window.carousel = carousel = Carousel box, slider,
+init = (container) ->
+  find = (q) -> container.getElementsByClassName(q)[0]
+  carousel = Carousel find('view'), find('scrollable'),
     timeConstant: 200
     allowScroll: true
-  document.getElementById('next').addEventListener 'click', carousel.next
-  document.getElementById('prev').addEventListener 'click', carousel.prev
+  find('next').addEventListener 'click', carousel.next
+  find('prev').addEventListener 'click', carousel.prev
+  carousel
+
+# Initialization logic
+window.addEventListener 'DOMContentLoaded', ->
+  window.carouselWhole = init document.getElementById 'container-whole'
+  window.carouselParts = init document.getElementById 'container-parts'

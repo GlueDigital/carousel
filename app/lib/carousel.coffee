@@ -4,6 +4,8 @@ module.exports = carousel = (box, slider, opts={}) ->
   opts.allowScroll = opts.allowScroll or false
   opts.withDots = opts.withDots or true
   opts.dotsParent = opts.dotsParent or null
+  opts.useTranslate3d = opts.useTranslate3d or true
+  opts.snapParts = opts.snapParts or true
 
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
@@ -34,8 +36,11 @@ module.exports = carousel = (box, slider, opts={}) ->
       offset = min
     else
       offset = x
-    slider.style[xform] = 'translateX(' + (-offset) + 'px)'
-    t = Math.round offset / boxWidth
+    if opts.useTranslate3d
+      slider.style[xform] = 'translate3d(' + (-offset) + 'px, 0, 0)'
+    else
+      slider.style[xform] = 'translateX(' + (-offset) + 'px)'
+    t = Math.round offset / snap
     if t isnt currSlide
       currSlide = t
       updateDots()
@@ -113,16 +118,77 @@ module.exports = carousel = (box, slider, opts={}) ->
     timestamp = Date.now()
     window.requestAnimationFrame autoScroll
 
-    # if not alsoScroll # Prevent warning about cancelling scroll
-    #   e.preventDefault()
-    #   e.stopPropagation()
-    #   false
-
   cancelClick = (e) ->
     if mustCancel
       e.preventDefault()
       e.stopPropagation()
       false
+
+  initialize = ->
+    # Initialize
+    if typeof window.ontouchstart isnt 'undefined'
+      slider.addEventListener 'touchstart', tap
+      slider.addEventListener 'touchmove', drag
+      slider.addEventListener 'touchend', release
+    slider.addEventListener 'mousedown', tap
+    slider.addEventListener 'mousemove', drag
+    slider.addEventListener 'mouseup', release
+    slider.addEventListener 'click', cancelClick, true
+
+    boxWidth = parseInt(window.getComputedStyle(box).width, 10)
+    sliderWidth = slider.scrollWidth
+    max = sliderWidth - boxWidth
+    offset = min = 0
+    pressed = false
+    timeConstant = opts.timeConstant
+
+    currSlide = 0
+    snap = boxWidth
+    if opts.snapParts
+      # Check if parts are smaller than one slide, and snap to those instead
+      c = slider.firstChild
+      while c
+        if c.nodeType isnt 3
+          candidate = parseInt(window.getComputedStyle(c).width, 10)
+          if candidate > 20 and candidate < snap
+            snap = candidate
+            break
+        c = c.nextSibling
+
+    xform = 'transform'
+    ['webkit', 'Moz', 'O', 'ms'].every (prefix) ->
+      e = prefix + 'Transform'
+      if 'undefined' isnt typeof slider.style[e]
+        xform = e
+        return false
+      return true
+
+    # Add indicator dots if requested
+    if opts.withDots
+      dots = document.createElement 'div'
+      dots.classList.add 'dots'
+      count = max / snap
+      for [0..count]
+        dot = document.createElement 'div'
+        dot.classList.add 'dot'
+        dots.appendChild dot
+      updateDots()
+      if opts.dotsParent
+        opts.dotsParent.appendChild dots
+      else
+        box.appendChild dots
+
+  tearDown = ->
+    slider.removeEventListener 'touchstart', tap
+    slider.removeEventListener 'touchmove', drag
+    slider.removeEventListener 'touchend', release
+    slider.removeEventListener 'mousedown', tap
+    slider.removeEventListener 'mousemove', drag
+    slider.removeEventListener 'mouseup', release
+    slider.removeEventListener 'click', cancelClick, true
+    if dots
+      dots.parentNode.removeChild dots
+    scroll 0
 
   # Public functions
   ret =
@@ -130,7 +196,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       currSlide
 
     getSlideCount: ->
-      max / boxWidth
+      max / snap
 
     move: (slides) ->
       lastSlide = ret.getSlideCount()
@@ -175,48 +241,9 @@ module.exports = carousel = (box, slider, opts={}) ->
         window.clearInterval auto if auto
         auto = null
 
+    reset: ->
+      tearDown()
+      initialize()
 
-  # Initialize
-  if typeof window.ontouchstart isnt 'undefined'
-    slider.addEventListener 'touchstart', tap
-    slider.addEventListener 'touchmove', drag
-    slider.addEventListener 'touchend', release
-  slider.addEventListener 'mousedown', tap
-  slider.addEventListener 'mousemove', drag
-  slider.addEventListener 'mouseup', release
-  slider.addEventListener 'click', cancelClick, true
-
-  boxWidth = parseInt(window.getComputedStyle(box).width, 10)
-  sliderWidth = slider.scrollWidth
-  max = sliderWidth - boxWidth
-  offset = min = 0
-  pressed = false
-  timeConstant = opts.timeConstant
-
-  snap = boxWidth
-  currSlide = 0
-
-  xform = 'transform'
-  ['webkit', 'Moz', 'O', 'ms'].every (prefix) ->
-    e = prefix + 'Transform'
-    if 'undefined' isnt typeof slider.style[e]
-      xform = e
-      return false
-    return true
-
-  # Add indicator dots if requested
-  if opts.withDots
-    dots = document.createElement 'div'
-    dots.classList.add 'dots'
-    count = max / boxWidth
-    for [0..count]
-      dot = document.createElement 'div'
-      dot.classList.add 'dot'
-      dots.appendChild dot
-    updateDots()
-    if opts.dotsParent
-      opts.dotsParent.appendChild dots
-    else
-      box.appendChild dots
-
+  initialize()
   ret
