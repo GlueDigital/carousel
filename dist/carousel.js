@@ -152,6 +152,9 @@
       boxWidth = parseInt(window.getComputedStyle(box).width, 10);
       sliderWidth = slider.scrollWidth;
       max = sliderWidth - boxWidth;
+      if (max < 0) {
+        max = 0;
+      }
       offset = min = 0;
       pressed = false;
       timeConstant = opts.timeConstant;
