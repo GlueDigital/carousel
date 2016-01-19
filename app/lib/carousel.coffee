@@ -6,6 +6,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   opts.dotsParent = opts.dotsParent or null
   opts.useTranslate3d = opts.useTranslate3d or true
   opts.snapParts = opts.snapParts or true
+  opts.slidePerTouch = opts.slidePerTouch or false
 
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
@@ -113,6 +114,11 @@ module.exports = carousel = (box, slider, opts={}) ->
     if velocity > 10 or velocity < -10
       amplitude = opts.amplitudeCoef * velocity
       target = offset + amplitude
+    if opts.slidePerTouch
+      if offset - startOffset > 0
+        target = startOffset + snap
+      else
+        target = startOffset - snap
     target = Math.round(target / snap) * snap
     amplitude = target - offset
     timestamp = Date.now()

@@ -13,6 +13,7 @@
     opts.dotsParent = opts.dotsParent || null;
     opts.useTranslate3d = opts.useTranslate3d || true;
     opts.snapParts = opts.snapParts || true;
+    opts.slidePerTouch = opts.slidePerTouch || true;
     min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
     xpos = function(e) {
       var ref;
@@ -125,6 +126,13 @@
       if (velocity > 10 || velocity < -10) {
         amplitude = opts.amplitudeCoef * velocity;
         target = offset + amplitude;
+      }
+      if (opts.slidePerTouch) {
+        if (offset - startOffset > 0) {
+          target = startOffset + snap;
+        } else {
+          target = startOffset - snap;
+        }
       }
       target = Math.round(target / snap) * snap;
       amplitude = target - offset;
