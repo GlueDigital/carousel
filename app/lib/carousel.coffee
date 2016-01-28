@@ -115,10 +115,10 @@ module.exports = carousel = (box, slider, opts={}) ->
       amplitude = opts.amplitudeCoef * velocity
       target = offset + amplitude
     if opts.slidePerTouch
-      if offset - startOffset > 0
-        target = startOffset + snap
-      else
+      if offset - startOffset < 0
         target = startOffset - snap
+      else
+        target = startOffset + snap
     target = Math.round(target / snap) * snap
     amplitude = target - offset
     timestamp = Date.now()
