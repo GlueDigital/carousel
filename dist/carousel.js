@@ -32,7 +32,11 @@
     updateDots = function() {
       if (dots) {
         return Array.prototype.map.call(dots.childNodes, function(dot, i) {
-          return dot.classList.toggle('active', i === currSlide);
+          if (i === currSlide) {
+            return dot.classList.add('active');
+          } else {
+            return dot.classList.remove('active');
+          }
         });
       }
     };
