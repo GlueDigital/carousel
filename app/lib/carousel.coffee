@@ -28,7 +28,10 @@ module.exports = carousel = (box, slider, opts={}) ->
   updateDots = ->
     if dots
       Array.prototype.map.call dots.childNodes, (dot, i) ->
-        dot.classList.toggle 'active', i is currSlide
+        if i is currSlide
+          dot.classList.add 'active'
+        else
+          dot.classList.remove 'active'
 
   scroll = (x) ->
     if x > max
