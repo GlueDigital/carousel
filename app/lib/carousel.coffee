@@ -143,6 +143,9 @@ module.exports = carousel = (box, slider, opts={}) ->
     slider.addEventListener 'mousemove', drag
     slider.addEventListener 'mouseup', release
     slider.addEventListener 'click', cancelClick, true
+    slider.addEventListener 'dragstart', (e) ->
+      e.preventDefault()
+      false
 
     boxWidth = parseInt(window.getComputedStyle(box).width, 10)
     sliderWidth = slider.scrollWidth

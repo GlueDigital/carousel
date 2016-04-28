@@ -161,6 +161,10 @@
       slider.addEventListener('mousemove', drag);
       slider.addEventListener('mouseup', release);
       slider.addEventListener('click', cancelClick, true);
+      slider.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+      });
       boxWidth = parseInt(window.getComputedStyle(box).width, 10);
       sliderWidth = slider.scrollWidth;
       max = sliderWidth - boxWidth;
