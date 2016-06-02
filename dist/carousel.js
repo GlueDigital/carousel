@@ -9,7 +9,8 @@
     dotsParent: null,
     useTranslate3d: true,
     snapParts: true,
-    slidePerTouch: false
+    slidePerTouch: false,
+    onDotsUpdated: null
   };
 
   module.exports = carousel = function(box, slider, opts) {
@@ -39,7 +40,7 @@
     };
     updateDots = function() {
       if (dots) {
-        return Array.prototype.map.call(dots.childNodes, function(dot, i) {
+        Array.prototype.map.call(dots.childNodes, function(dot, i) {
           if (i === currSlide) {
             return dot.classList.add('active');
           } else {
@@ -47,6 +48,7 @@
           }
         });
       }
+      return typeof opts.onDotsUpdated === "function" ? opts.onDotsUpdated(currSlide, Math.round(max / snap)) : void 0;
     };
     scroll = function(x) {
       var t;
@@ -218,11 +220,12 @@
         }
         updateDots();
         if (opts.dotsParent) {
-          return opts.dotsParent.appendChild(dots);
+          opts.dotsParent.appendChild(dots);
         } else {
-          return box.appendChild(dots);
+          box.appendChild(dots);
         }
       }
+      return typeof opts.onDotsUpdated === "function" ? opts.onDotsUpdated(currSlide, Math.round(max / snap)) : void 0;
     };
     tearDown = function() {
       slider.removeEventListener('touchstart', tap);
@@ -242,7 +245,7 @@
         return currSlide;
       },
       getSlideCount: function() {
-        return max / snap;
+        return Math.round(max / snap);
       },
       move: function(slides) {
         var lastSlide;

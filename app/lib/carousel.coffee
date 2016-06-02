@@ -7,6 +7,7 @@ optsDefaults =
   useTranslate3d: true
   snapParts: true
   slidePerTouch: false
+  onDotsUpdated: null
 
 module.exports = carousel = (box, slider, opts={}) ->
   for key of optsDefaults
@@ -36,6 +37,7 @@ module.exports = carousel = (box, slider, opts={}) ->
           dot.classList.add 'active'
         else
           dot.classList.remove 'active'
+    opts.onDotsUpdated? currSlide, Math.round max / snap
 
   scroll = (x) ->
     if x > max
@@ -196,6 +198,8 @@ module.exports = carousel = (box, slider, opts={}) ->
       else
         box.appendChild dots
 
+    opts.onDotsUpdated? currSlide, Math.round max / snap
+
   tearDown = ->
     slider.removeEventListener 'touchstart', tap
     slider.removeEventListener 'touchmove', drag
@@ -214,7 +218,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       currSlide
 
     getSlideCount: ->
-      max / snap
+      Math.round max / snap
 
     move: (slides) ->
       lastSlide = ret.getSlideCount()
