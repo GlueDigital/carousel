@@ -1,19 +1,27 @@
 (function() {
-  var carousel;
+  var carousel, optsDefaults;
+
+  optsDefaults = {
+    amplitudeCoef: 0.8,
+    timeConstant: 325,
+    allowScroll: false,
+    withDots: true,
+    dotsParent: null,
+    useTranslate3d: true,
+    snapParts: true,
+    slidePerTouch: false
+  };
 
   module.exports = carousel = function(box, slider, opts) {
-    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, currSlide, dots, drag, frame, initialize, max, min, mustCancel, offset, overlay, pressed, reference, release, ret, scroll, snap, startOffset, tap, target, tearDown, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
+    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, currSlide, dots, drag, frame, initialize, key, max, min, mustCancel, offset, overlay, pressed, reference, release, ret, scroll, snap, startOffset, tap, target, tearDown, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
     if (opts == null) {
       opts = {};
     }
-    opts.amplitudeCoef = opts.amplitudeCoef || 0.8;
-    opts.timeConstant = opts.timeConstant || 325;
-    opts.allowScroll = opts.allowScroll || false;
-    opts.withDots = opts.withDots || true;
-    opts.dotsParent = opts.dotsParent || null;
-    opts.useTranslate3d = opts.useTranslate3d || true;
-    opts.snapParts = opts.snapParts || true;
-    opts.slidePerTouch = opts.slidePerTouch || false;
+    for (key in optsDefaults) {
+      if (!opts.hasOwnProperty(key)) {
+        opts[key] = optsDefaults[key];
+      }
+    }
     min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
     xpos = function(e) {
       var ref;
@@ -253,20 +261,40 @@
         window.requestAnimationFrame(autoScroll);
         return currSlide + slides;
       },
-      next: function() {
+      next: function(e) {
+        if (e != null) {
+          if (typeof e.preventDefault === "function") {
+            e.preventDefault();
+          }
+        }
         return ret.move(1);
       },
-      prev: function() {
+      prev: function(e) {
+        if (e != null) {
+          if (typeof e.preventDefault === "function") {
+            e.preventDefault();
+          }
+        }
         return ret.move(-1);
       },
-      nextCyclic: function() {
+      nextCyclic: function(e) {
+        if (e != null) {
+          if (typeof e.preventDefault === "function") {
+            e.preventDefault();
+          }
+        }
         if (ret.getCurrentSlide() === ret.getSlideCount()) {
           return ret.move(-ret.getCurrentSlide());
         } else {
           return ret.move(1);
         }
       },
-      prevCyclic: function() {
+      prevCyclic: function(e) {
+        if (e != null) {
+          if (typeof e.preventDefault === "function") {
+            e.preventDefault();
+          }
+        }
         if (ret.getCurrentSlide === 0) {
           return ret.move(ret.getSlideCount());
         } else {

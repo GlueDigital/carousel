@@ -1,12 +1,16 @@
+optsDefaults =
+  amplitudeCoef: 0.8
+  timeConstant: 325
+  allowScroll: false
+  withDots: true
+  dotsParent: null
+  useTranslate3d: true
+  snapParts: true
+  slidePerTouch: false
+
 module.exports = carousel = (box, slider, opts={}) ->
-  opts.amplitudeCoef = opts.amplitudeCoef or 0.8
-  opts.timeConstant = opts.timeConstant or 325
-  opts.allowScroll = opts.allowScroll or false
-  opts.withDots = opts.withDots or true
-  opts.dotsParent = opts.dotsParent or null
-  opts.useTranslate3d = opts.useTranslate3d or true
-  opts.snapParts = opts.snapParts or true
-  opts.slidePerTouch = opts.slidePerTouch or false
+  for key of optsDefaults
+    opts[key] = optsDefaults[key] if not opts.hasOwnProperty key
 
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
@@ -228,19 +232,23 @@ module.exports = carousel = (box, slider, opts={}) ->
 
       currSlide + slides
 
-    next: ->
+    next: (e) ->
+      e?.preventDefault?()
       ret.move 1
 
-    prev: ->
+    prev: (e) ->
+      e?.preventDefault?()
       ret.move -1
 
-    nextCyclic: ->
+    nextCyclic: (e) ->
+      e?.preventDefault?()
       if ret.getCurrentSlide() is ret.getSlideCount()
         ret.move -ret.getCurrentSlide()
       else
         ret.move 1
 
-    prevCyclic: ->
+    prevCyclic: (e) ->
+      e?.preventDefault?()
       if ret.getCurrentSlide is 0
         ret.move ret.getSlideCount()
       else
