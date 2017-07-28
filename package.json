@@ -1,13 +1,17 @@
 {
-  "name": "carousel",
-  "version": "0.3.2",
+  "name": "glue-carousel",
+  "version": "0.3.3",
   "description": "Simple carousel module.",
-  "main": "dist/carousel",
+  "main": "dist/carousel.js",
   "scripts": {
     "start": "grunt dev",
-    "build": "grunt build"
+    "prepublish": "grunt build"
   },
-  "author": "Anxo Soto",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GlueDigital/carousel"
+  },
+  "author": "Glue.gl",
   "license": "ISC",
   "devDependencies": {
     "browser-sync": "^2.7.12",

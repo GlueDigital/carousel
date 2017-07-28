@@ -5,19 +5,19 @@ Simple carousel library.
 
 ## Installation
 
-  npm install git+ssh://git@gitlab.com:glue-gl/carousel.git --save
+> npm install glue-carousel --save
 
 ## Usage
 
-  Carousel = require('carousel')
-  instance = Carousel boxDiv, sliderDiv
-  instance.next()
+> const Carousel = require('glue-carousel')<br>
+> const instance = Carousel(boxDiv, sliderDiv)<br>
+> instance.next()
 
 ## Contributing
 
 To help with development, start the quick edit mode by running
 
-  grunt dev
+> grunt dev
 
 The browser window should appear with the page, live-reloading with any changes.
 Happy coding!
