@@ -142,14 +142,14 @@ module.exports = carousel = (box, slider, opts={}) ->
   initialize = ->
     # Initialize
     if typeof window.ontouchstart isnt 'undefined'
-      slider.addEventListener 'touchstart', tap
-      slider.addEventListener 'touchmove', drag
-      slider.addEventListener 'touchend', release
-    slider.addEventListener 'mousedown', tap
-    slider.addEventListener 'mousemove', drag
-    slider.addEventListener 'mouseup', release
-    slider.addEventListener 'click', cancelClick, true
-    slider.addEventListener 'dragstart', (e) ->
+      box.addEventListener 'touchstart', tap
+      box.addEventListener 'touchmove', drag
+      box.addEventListener 'touchend', release
+    box.addEventListener 'mousedown', tap
+    box.addEventListener 'mousemove', drag
+    box.addEventListener 'mouseup', release
+    box.addEventListener 'click', cancelClick, true
+    box.addEventListener 'dragstart', (e) ->
       e.preventDefault()
       false
 
@@ -201,13 +201,13 @@ module.exports = carousel = (box, slider, opts={}) ->
     opts.onDotsUpdated? currSlide, Math.round max / snap
 
   tearDown = ->
-    slider.removeEventListener 'touchstart', tap
-    slider.removeEventListener 'touchmove', drag
-    slider.removeEventListener 'touchend', release
-    slider.removeEventListener 'mousedown', tap
-    slider.removeEventListener 'mousemove', drag
-    slider.removeEventListener 'mouseup', release
-    slider.removeEventListener 'click', cancelClick, true
+    box.removeEventListener 'touchstart', tap
+    box.removeEventListener 'touchmove', drag
+    box.removeEventListener 'touchend', release
+    box.removeEventListener 'mousedown', tap
+    box.removeEventListener 'mousemove', drag
+    box.removeEventListener 'mouseup', release
+    box.removeEventListener 'click', cancelClick, true
     if dots
       dots.parentNode.removeChild dots
     scroll 0

@@ -163,15 +163,15 @@
     initialize = function() {
       var c, candidate, count, dot, j, ref, sliderWidth;
       if (typeof window.ontouchstart !== 'undefined') {
-        slider.addEventListener('touchstart', tap);
-        slider.addEventListener('touchmove', drag);
-        slider.addEventListener('touchend', release);
+        box.addEventListener('touchstart', tap);
+        box.addEventListener('touchmove', drag);
+        box.addEventListener('touchend', release);
       }
-      slider.addEventListener('mousedown', tap);
-      slider.addEventListener('mousemove', drag);
-      slider.addEventListener('mouseup', release);
-      slider.addEventListener('click', cancelClick, true);
-      slider.addEventListener('dragstart', function(e) {
+      box.addEventListener('mousedown', tap);
+      box.addEventListener('mousemove', drag);
+      box.addEventListener('mouseup', release);
+      box.addEventListener('click', cancelClick, true);
+      box.addEventListener('dragstart', function(e) {
         e.preventDefault();
         return false;
       });
@@ -228,13 +228,13 @@
       return typeof opts.onDotsUpdated === "function" ? opts.onDotsUpdated(currSlide, Math.round(max / snap)) : void 0;
     };
     tearDown = function() {
-      slider.removeEventListener('touchstart', tap);
-      slider.removeEventListener('touchmove', drag);
-      slider.removeEventListener('touchend', release);
-      slider.removeEventListener('mousedown', tap);
-      slider.removeEventListener('mousemove', drag);
-      slider.removeEventListener('mouseup', release);
-      slider.removeEventListener('click', cancelClick, true);
+      box.removeEventListener('touchstart', tap);
+      box.removeEventListener('touchmove', drag);
+      box.removeEventListener('touchend', release);
+      box.removeEventListener('mousedown', tap);
+      box.removeEventListener('mousemove', drag);
+      box.removeEventListener('mouseup', release);
+      box.removeEventListener('click', cancelClick, true);
       if (dots) {
         dots.parentNode.removeChild(dots);
       }
