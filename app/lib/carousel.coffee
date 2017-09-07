@@ -153,7 +153,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       e.preventDefault()
       false
 
-    boxWidth = parseInt(window.getComputedStyle(box).width, 10)
+    boxWidth = parseInt(window.getComputedStyle(slider).width, 10)
     sliderWidth = slider.scrollWidth
     max = sliderWidth - boxWidth
     if max < 0
