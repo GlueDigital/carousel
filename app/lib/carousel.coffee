@@ -110,7 +110,9 @@ module.exports = carousel = (box, slider, opts={}) ->
       if delta > 2 or delta < -2
         reference = x
         scroll offset + delta
-    if not alsoScroll
+    # if not alsoScroll
+    if not opts.allowScroll
+      # TODO: alsoScroll was misbehaving on iOS, so we had to disable it for now
       e.preventDefault()
       e.stopPropagation()
       false

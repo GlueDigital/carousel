@@ -127,7 +127,7 @@
           scroll(offset + delta);
         }
       }
-      if (!alsoScroll) {
+      if (!opts.allowScroll) {
         e.preventDefault();
         e.stopPropagation();
         return false;
