@@ -6,6 +6,7 @@
     timeConstant: 325,
     allowScroll: false,
     withDots: true,
+    dotsClickable: true,
     dotsParent: null,
     useTranslate3d: true,
     snapParts: true,
@@ -160,8 +161,8 @@
         return false;
       }
     };
-    initialize = function() {
-      var c, candidate, count, dot, j, ref, sliderWidth;
+    initialize = function(handler) {
+      var c, candidate, count, dot, i, j, ref, sliderWidth;
       if (typeof window.ontouchstart !== 'undefined') {
         box.addEventListener('touchstart', tap);
         box.addEventListener('touchmove', drag);
@@ -213,8 +214,16 @@
         dots = document.createElement('div');
         dots.classList.add('dots');
         count = max / snap;
-        for (j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; 0 <= ref ? j++ : j--) {
+        for (i = j = 0, ref = count; 0 <= ref ? j <= ref : j >= ref; i = 0 <= ref ? ++j : --j) {
           dot = document.createElement('div');
+          if (opts.dotsClickable) {
+            (function(i) {
+              return dot.addEventListener('click', function(e) {
+                e.preventDefault();
+                return handler.jumpTo(i);
+              });
+            })(i);
+          }
           dot.classList.add('dot');
           dots.appendChild(dot);
         }
@@ -263,6 +272,9 @@
         timestamp = Date.now();
         window.requestAnimationFrame(autoScroll);
         return currSlide + slides;
+      },
+      jumpTo: function(slide) {
+        return ret.move(slide - currSlide);
       },
       next: function(e) {
         if (e != null) {
@@ -329,7 +341,7 @@
         return initialize();
       }
     };
-    initialize();
+    initialize(ret);
     return ret;
   };
 

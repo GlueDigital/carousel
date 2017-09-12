@@ -3,6 +3,7 @@ optsDefaults =
   timeConstant: 325
   allowScroll: false
   withDots: true
+  dotsClickable: true
   dotsParent: null
   useTranslate3d: true
   snapParts: true
@@ -141,7 +142,7 @@ module.exports = carousel = (box, slider, opts={}) ->
       e.stopPropagation()
       false
 
-  initialize = ->
+  initialize = (handler) ->
     # Initialize
     if typeof window.ontouchstart isnt 'undefined'
       box.addEventListener 'touchstart', tap
@@ -190,8 +191,13 @@ module.exports = carousel = (box, slider, opts={}) ->
       dots = document.createElement 'div'
       dots.classList.add 'dots'
       count = max / snap
-      for [0..count]
+      for i in [0..count]
         dot = document.createElement 'div'
+        if opts.dotsClickable
+          do (i) ->
+            dot.addEventListener 'click', (e) ->
+              e.preventDefault()
+              handler.jumpTo i
         dot.classList.add 'dot'
         dots.appendChild dot
       updateDots()
@@ -238,6 +244,9 @@ module.exports = carousel = (box, slider, opts={}) ->
 
       currSlide + slides
 
+    jumpTo: (slide) ->
+      ret.move slide - currSlide
+
     next: (e) ->
       e?.preventDefault?()
       ret.move 1
@@ -273,5 +282,5 @@ module.exports = carousel = (box, slider, opts={}) ->
       tearDown()
       initialize()
 
-  initialize()
+  initialize ret
   ret
