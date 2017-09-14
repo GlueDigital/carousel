@@ -1,6 +1,6 @@
 {
   "name": "glue-carousel",
-  "version": "0.3.7",
+  "version": "0.3.8",
   "description": "Simple carousel module.",
   "main": "dist/carousel.js",
   "scripts": {

@@ -15,7 +15,7 @@
   };
 
   module.exports = carousel = function(box, slider, opts) {
-    var alsoScroll, amplitude, auto, autoScroll, boxWidth, cancelClick, currSlide, dots, drag, frame, initialize, key, max, min, mustCancel, offset, overlay, pressed, reference, release, ret, scroll, snap, startOffset, tap, target, tearDown, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
+    var amplitude, auto, autoScroll, boxWidth, cancelClick, currSlide, dots, drag, frame, initialize, key, max, min, mustCancel, offset, overlay, pressed, reference, release, ret, scroll, scrollInstead, snap, startOffset, tap, target, tearDown, ticker, timeConstant, timestamp, track, updateDots, velocity, xform, xpos, xstart, ypos, ystart;
     if (opts == null) {
       opts = {};
     }
@@ -24,7 +24,7 @@
         opts[key] = optsDefaults[key];
       }
     }
-    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = alsoScroll = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
+    min = max = offset = reference = pressed = xform = velocity = frame = snap = timestamp = ticker = amplitude = target = timeConstant = overlay = auto = scrollInstead = xstart = ystart = startOffset = currSlide = dots = mustCancel = boxWidth = null;
     xpos = function(e) {
       var ref;
       if (((ref = e.targetTouches) != null ? ref.length : void 0) >= 1) {
@@ -98,7 +98,7 @@
       pressed = true;
       xstart = reference = xpos(e);
       ystart = ypos(e);
-      alsoScroll = false;
+      scrollInstead = null;
       startOffset = offset;
       velocity = amplitude = 0;
       frame = offset;
@@ -109,7 +109,7 @@
     };
     drag = function(e) {
       var delta, totalX, totalY, x, y;
-      if (pressed) {
+      if (pressed && !scrollInstead) {
         x = xpos(e);
         y = ypos(e);
         delta = reference - x;
@@ -118,9 +118,12 @@
         if (totalX > 30 || totalY > 30) {
           mustCancel = true;
         }
-        if (opts.allowScroll) {
-          if (totalY > totalX && totalY > 30) {
-            alsoScroll = true;
+        if (opts.allowScroll && scrollInstead === null) {
+          if (totalY > totalX) {
+            scrollInstead = true;
+            return;
+          } else {
+            scrollInstead = false;
           }
         }
         if (delta > 2 || delta < -2) {
@@ -128,7 +131,7 @@
           scroll(offset + delta);
         }
       }
-      if (!opts.allowScroll) {
+      if (scrollInstead === false) {
         e.preventDefault();
         e.stopPropagation();
         return false;

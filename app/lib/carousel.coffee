@@ -17,7 +17,7 @@ module.exports = carousel = (box, slider, opts={}) ->
   # Instance vars; make sure they aren't bound to the functions!
   min = max = offset = reference = pressed = xform = velocity = frame = snap =
     timestamp = ticker = amplitude = target = timeConstant = overlay = auto =
-    alsoScroll = xstart = ystart = startOffset = currSlide = dots =
+    scrollInstead = xstart = ystart = startOffset = currSlide = dots =
     mustCancel = boxWidth = null
 
   # Internal functions
@@ -80,7 +80,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     pressed = true
     xstart = reference = xpos e
     ystart = ypos e
-    alsoScroll = false
+    scrollInstead = null
     startOffset = offset
 
     velocity = amplitude = 0
@@ -96,7 +96,7 @@ module.exports = carousel = (box, slider, opts={}) ->
     #   false
 
   drag = (e) ->
-    if pressed
+    if pressed and not scrollInstead
       x = xpos e
       y = ypos e
       delta = reference - x
@@ -104,16 +104,17 @@ module.exports = carousel = (box, slider, opts={}) ->
       totalX = Math.abs xstart - x
       if totalX > 30 or totalY > 30
         mustCancel = true
-      if opts.allowScroll
+      if opts.allowScroll and scrollInstead is null
         # Scroll only if movement has been mostly vertical
-        if totalY > totalX and totalY > 30
-          alsoScroll = true
+        if totalY > totalX
+          scrollInstead = true
+          return
+        else
+          scrollInstead = false
       if delta > 2 or delta < -2
         reference = x
         scroll offset + delta
-    # if not alsoScroll
-    if not opts.allowScroll
-      # TODO: alsoScroll was misbehaving on iOS, so we had to disable it for now
+    if scrollInstead is false
       e.preventDefault()
       e.stopPropagation()
       false
