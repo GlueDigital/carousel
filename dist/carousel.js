@@ -279,6 +279,11 @@
       jumpTo: function(slide) {
         return ret.move(slide - currSlide);
       },
+      teleportTo: function(slides) {
+        target = (Math.round(target / snap) + slides) * snap;
+        scroll(target);
+        return currSlide + slides;
+      },
       next: function(e) {
         if (e != null) {
           if (typeof e.preventDefault === "function") {

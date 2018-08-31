@@ -248,6 +248,11 @@ module.exports = carousel = (box, slider, opts={}) ->
     jumpTo: (slide) ->
       ret.move slide - currSlide
 
+    teleportTo: (slides) ->
+      target = (Math.round(target / snap) + slides) * snap
+      scroll target
+      currSlide + slides
+
     next: (e) ->
       e?.preventDefault?()
       ret.move 1
